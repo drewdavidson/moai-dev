@@ -30,6 +30,11 @@ private:
 	const b2ContactImpulse*		mImpulse;
 
 	b2Vec2  mContactNormal;
+	//BEGIN DREW
+	b2Vec2 mContactPoint1;
+	b2Vec2 mContactPoint2;
+	int mNumContactPoints;
+	//END DREW
 	float	mNormalImpulse;
 	float	mTangentImpulse;
 
@@ -38,6 +43,7 @@ private:
 
 	//----------------------------------------------------------------//
 	static int		_getContactNormal		( lua_State* L );
+	static int		_getContactPoints		( lua_State* L );
 	static int		_getNormalImpulse		( lua_State* L );
 	static int		_getTangentImpulse		( lua_State* L );
 	static int		_setContactEnabled		( lua_State* L );

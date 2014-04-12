@@ -28,6 +28,34 @@ int MOAIBox2DArbiter::_getContactNormal ( lua_State* L ) {
 	return 2;
 }
 
+//BEGIN DREW
+//-----------------------------------------------------------------//
+/**	@name	getContactPoints
+ @text	Returns the first point of contact.
+ 
+ @in	MOAIBox2DArbiter self
+ @out	number contact.x
+ @out	number contact.y
+ */
+int MOAIBox2DArbiter::_getContactPoints ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIBox2DArbiter, "U" )
+
+	//USLog::Print("DREW test getContactPoint1 %f %f\n", self->mContactPoint.x, self->mContactPoint.y);
+	
+	state.Push ( self->mContactPoint1.x );
+	state.Push ( self->mContactPoint1.y );
+	if (self->mNumContactPoints == 2){
+		state.Push ( self->mContactPoint2.x );
+		state.Push ( self->mContactPoint2.y );
+	} else {
+		//To ensure a constant number of out params, we'll just push the first point twice
+		state.Push ( self->mContactPoint1.x );
+		state.Push ( self->mContactPoint1.y );
+	}
+	return 4;
+}
+//END DREW
+
 //----------------------------------------------------------------//
 /**	@name	getNormalImpulse
 	@text	Returns total normal impulse for contact.
@@ -171,10 +199,21 @@ void MOAIBox2DArbiter::PostSolve ( b2Contact* contact, const b2ContactImpulse* i
 	b2WorldManifold* worldManifold = new b2WorldManifold ();
 	contact->GetWorldManifold ( worldManifold );
 	this->mContactNormal = worldManifold->normal;
-	delete worldManifold;
 	
 	b2Manifold* manifold = contact->GetManifold ();
 	u32 totalPoints = manifold->pointCount;
+
+	//BEGIN DREW
+	this->mNumContactPoints = totalPoints;
+	this->mContactPoint1 = worldManifold->points[0];
+	if (totalPoints > 1){
+		this->mContactPoint2 = worldManifold->points[1];
+	} else {
+		//Just leave junk in mContactPoint2, it's never getting used
+	}
+	//END DREW
+
+	delete worldManifold;
 	
 	this->mNormalImpulse = 0.0f;
 	this->mTangentImpulse = 0.0f;
@@ -200,6 +239,27 @@ void MOAIBox2DArbiter::PreSolve ( b2Contact* contact, const b2Manifold* oldManif
 	
 	MOAIBox2DFixture* moaiFixtureA = ( MOAIBox2DFixture* )fixtureA->GetUserData ();
 	MOAIBox2DFixture* moaiFixtureB = ( MOAIBox2DFixture* )fixtureB->GetUserData ();
+
+
+	b2WorldManifold* worldManifold = new b2WorldManifold ();
+	contact->GetWorldManifold ( worldManifold );
+
+	//BEGIN DREW
+	b2Manifold * manifold = contact->GetManifold();
+
+	this->mContactNormal = worldManifold->normal;
+
+	int totalPoints = manifold->pointCount;
+	this->mNumContactPoints = totalPoints;
+	this->mContactPoint1 = worldManifold->points[0];
+	if (totalPoints > 1){
+		this->mContactPoint2 = worldManifold->points[1];
+	} else {
+		// uhh... I guess we'll just leave junk in the second point for now?
+		// it will never reach user code
+	}
+	delete worldManifold;
+	//END DREW
 	
 	moaiFixtureA->HandleCollision ( PRE_SOLVE, moaiFixtureB, this );
 	moaiFixtureB->HandleCollision ( PRE_SOLVE, moaiFixtureA, this );
@@ -227,6 +287,7 @@ void MOAIBox2DArbiter::RegisterLuaFuncs ( MOAILuaState& state ) {
 
 	luaL_Reg regTable [] = {
 		{ "getContactNormal",			_getContactNormal },
+		{ "getContactPoints",			_getContactPoints },
 		{ "getNormalImpulse",			_getNormalImpulse },
 		{ "getTangentImpulse",			_getTangentImpulse },
 		{ "setContactEnabled",			_setContactEnabled },

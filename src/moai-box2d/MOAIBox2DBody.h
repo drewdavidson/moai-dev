@@ -44,6 +44,9 @@ private:
 	static int		_getLinearVelocity		( lua_State* L );
 	static int		_getLocalCenter			( lua_State* L );
 	static int		_getMass				( lua_State* L );
+	//BEGIN DREW
+	static int		_getLocalPoint			( lua_State* L );
+	//END DREW
 	static int		_getPosition			( lua_State* L );
 	static int		_getWorldCenter			( lua_State* L );
 	static int		_isActive				( lua_State* L );

@@ -507,6 +507,38 @@ int MOAIBox2DBody::_getLocalCenter ( lua_State* L ) {
 	return 2;
 }
 
+//BEGIN DREW
+//----------------------------------------------------------------//
+/**	@name	getLocalPoint
+	@text	See Box2D documentation.
+	
+	@in		MOAIBox2DBody self
+	@out	number pointX	in units, world coordinates, converted from meters
+	@out	number pointY	in units, world coordinates, converted from meters
+*/
+int MOAIBox2DBody::_getLocalPoint ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIBox2DBody, "U" )
+	float unitsToMeters = self->GetUnitsToMeters ();
+	//float metersToUnits = 1.0 / unitsToMeters;
+	
+	if ( !self->mBody ) {
+		MOAILog ( state, MOAILogMessages::MOAIBox2DBody_MissingInstance );
+		return 0;
+	}
+
+	b2Vec2 v;
+	v.x		= state.GetValue < float >( 2, 0.0f ) * unitsToMeters;
+	v.y		= state.GetValue < float >( 3, 0.0f ) * unitsToMeters;
+
+	
+	b2Vec2 point = self->mBody->GetLocalPoint (v);
+	lua_pushnumber ( state, point.x / unitsToMeters );
+	lua_pushnumber ( state, point.y / unitsToMeters );
+	
+	return 2;
+}
+//END DREW
+
 //----------------------------------------------------------------//
 /**	@name	getMass
 	@text   See Box2D documentation.
@@ -1068,6 +1100,9 @@ void MOAIBox2DBody::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getGravityScale",		_getGravityScale },
 		{ "getLinearVelocity",		_getLinearVelocity },
 		{ "getLocalCenter",			_getLocalCenter },
+		//BEGIN DREW
+		{ "getLocalPoint",			_getLocalPoint },
+		//END DREW
 		{ "getMass",				_getMass },
 		{ "getPosition",			_getPosition },
 		{ "getWorldCenter",			_getWorldCenter },

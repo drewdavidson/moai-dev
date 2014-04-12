@@ -1,3 +1,9 @@
+#Drew's Moai Branch
+
+This is a messy branch of Moai 1.5. Since it's for a hobby project, it's probably a pretty incremental
+difference from the main Moai branch, but those few changes will probably just break things for you. 
+You're much better off using the upstream version.
+
 # Welcome to Moai!
 
 Thanks for checking out the Moai source code. Here's the scoop.

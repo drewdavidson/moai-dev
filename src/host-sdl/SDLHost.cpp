@@ -62,6 +62,9 @@ void _AKUOpenWindowFunc ( const char* title, int width, int height ) {
 		AKUDetectGfxContext ();
 		AKUSetScreenSize ( width, height );
 	}
+	//BEGIN DREW
+	SDL_ShowCursor(0);
+	//END DREW
 }
 
 //================================================================//
